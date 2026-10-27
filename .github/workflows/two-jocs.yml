@@ -9,6 +9,7 @@ jobs:
       - run: echo "I am job one"
 
   job-two:
+    needs: job-one
     runs-on: ubuntu-latest
     steps:
       - run: echo "I am job two"
