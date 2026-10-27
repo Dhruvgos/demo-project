@@ -1,0 +1,16 @@
+name: Hello Workflow
+
+on: push
+
+jobs:
+  say-hello:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print a greeting
+        run: echo "Hello from GitHub Actions!"
+
+      - name: Show where I'm running
+        run: |
+          echo "Commit: ${{ github.sha }}"
+          echo "Branch: ${{ github.ref_name }}"
+          uname -a
