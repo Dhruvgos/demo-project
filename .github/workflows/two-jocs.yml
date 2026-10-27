@@ -1,0 +1,14 @@
+name: Two Jobs
+
+on: push
+
+jobs:
+  job-one:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "I am job one"
+
+  job-two:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "I am job two"
