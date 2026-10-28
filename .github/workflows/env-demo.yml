@@ -1,0 +1,27 @@
+name: Env Demo
+on: push
+
+env:                          # workflow level: every job sees it
+  APP_NAME: demo-project
+
+jobs:
+  show-env:
+    runs-on: ubuntu-latest
+    env:                      # job level: every step in this job sees it
+      ENVIRONMENT: staging
+    steps:
+      - name: Print variables
+        env:                  # step level: only this step sees it
+          GREETING: hello
+        run: |
+          echo "App: $APP_NAME"
+          echo "Env: $ENVIRONMENT"
+          echo "Greeting: $GREETING"
+
+  show-secret:
+    runs-on: ubuntu-latest
+    steps: 
+      - name: Use the secret
+        env:
+           MY_SECRET: ${{ secrets.MY_SECRET }}
+        run: echo "The secret is $MY_SECRET"      
