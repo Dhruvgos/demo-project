@@ -16,7 +16,7 @@ jobs:
 
       - name: Smoke test the container
         run: |
-          docker run -d -p 8080:80 --name app demo-project:test
+          docker run -d -p 8080:3000 --name app demo-project:test
           sleep 10
           curl --fail http://localhost:8080
 
