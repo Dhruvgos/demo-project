@@ -47,6 +47,7 @@ jobs:
     needs: build-and-push
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
+    environment : production
     steps:
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1
@@ -61,24 +62,4 @@ jobs:
             docker run -d --name app --restart unless-stopped -p 80:3000 \
               ${{ secrets.DOCKERHUB_USERNAME }}/demo-project:${{ github.sha }}
 
-              deploy:
-                needs: build-and-push
-                if: github.event_name == 'push'
-                runs-on: ubuntu-latest
-                environment: production
-                steps:
-                  - name: Deploy to EC2
-                    uses: appleboy/ssh-action@v1
-                    with:
-                      host: ${{ secrets.EC2_HOST }}
-                      username: ${{ secrets.EC2_USER }}
-                      key: ${{ secrets.EC2_SSH_KEY }}
-                      script_stop: true
-                      script: |
-                        docker pull ${{ secrets.DOCKERHUB_USERNAME }}/demo-project:${{ github.sha }}
-                        docker stop app || true
-                        docker rm app || true
-                        docker run -d --name app --restart unless-stopped -p 80:3000 \
-                          ${{ secrets.DOCKERHUB_USERNAME }}/demo-project:${{ github.sha }}            
-
-          
+              
