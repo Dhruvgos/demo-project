@@ -17,7 +17,7 @@ jobs:
       - name: Smoke test the container
         run: |
           docker run -d -p 8080:3000 --name app demo-project:test
-          sleep 10
+          sleep 5
           curl --fail http://localhost:8080
 
   build-and-push:
@@ -43,3 +43,40 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/demo-project:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+  deploy:
+    needs: build-and-push
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/demo-project:${{ github.sha }}
+            docker stop app || true
+            docker rm app || true
+            docker run -d --name app --restart unless-stopped -p 80:3000 \
+              ${{ secrets.DOCKERHUB_USERNAME }}/demo-project:${{ github.sha }}
+
+              deploy:
+                needs: build-and-push
+                if: github.event_name == 'push'
+                runs-on: ubuntu-latest
+                steps:
+                  - name: Deploy to EC2
+                    uses: appleboy/ssh-action@v1
+                    with:
+                      host: ${{ secrets.EC2_HOST }}
+                      username: ${{ secrets.EC2_USER }}
+                      key: ${{ secrets.EC2_SSH_KEY }}
+                      script: |
+                        docker pull ${{ secrets.DOCKERHUB_USERNAME }}/demo-project:${{ github.sha }}
+                        docker stop app || true
+                        docker rm app || true
+                        docker run -d --name app --restart unless-stopped -p 80:3000 \
+                          ${{ secrets.DOCKERHUB_USERNAME }}/demo-project:${{ github.sha }}            
+
+          
